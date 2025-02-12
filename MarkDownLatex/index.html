@@ -1,26 +1,80 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markdown + LaTeX</title>
-  <link rel="stylesheet" href="./main.css" />
-  <script src="./main.js"></script>
-  <script type="text/javascript" async
-    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      line-height: 1.6;
-      padding: 16px;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-  </style>
-</head>
-<body>
-  <div class="container" id="contents"></div>
-</body>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>支持高级 LaTeX 的 Markdown 渲染</title>
+                <!-- 引入 Marked.js -->
+                <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+                <!-- 引入 MathJax 配置 -->
+                <script>
+                    window.MathJax = {
+                        tex: {
+                            inlineMath: [['\\(', '\\)']],    // 行内公式分隔符
+                            displayMath: [['\\[', '\\]']],   // 块级公式分隔符
+                            processEscapes: true,               // 支持反斜杠转义
+                            packages: {
+                                '[+]': ['base', 'ams', 'amssymb', 'boldsymbol', 'physics', 'mhchem', 'newcommand']
+                            }
+                        },
+                        startup: {
+                            typeset: false                       // 禁止自动初始化，手动控制渲染
+                        },
+                        loader: {
+                            load: ['[tex]/mhchem', '[tex]/physics']
+                        }
+                    };
+                </script>
+                <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+                <style>
+                    .MathJax {
+                        font-size: 1.3em !important;
+                    }
+                    /* 表格样式 */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 10px 0;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                    }
+                </style>
+            </head>
+    <body>
+        <div id="rendered-content"></div>
+        
+        <script>
+            
+            // 配置 Marked.js，启用表格支持
+            marked.setOptions({
+                breaks: true,
+                tables: true,
+                gfm: true,
+                headerIds: true,
+                smartLists: true,
+                smartypants: true,
+                xhtml: true,
+                mangle: false, // 禁用邮箱混淆
+                sanitize: false
+            });
+            
+            var text = ""
+            // 渲染函数
+            function renderMarkdown(markdownText) {
+                markdownText += "\n"
+                text += markdownText
+                document.getElementById('rendered-content').innerHTML = marked.parse(text);;
+                // 确保 MathJax 重新渲染
+                MathJax.typesetPromise().catch(err => console.log(err));
+            }
+            window.renderMarkdown = renderMarkdown; // 暴露给 客户端 调用
+        </script>
+        
+    </body>
 </html>
